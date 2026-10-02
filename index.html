@@ -11,22 +11,24 @@
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
-  --paper:#EEF1ED; --surface:#F8FAF7; --ink:#15202A; --muted:#556470; --line:#C9D2CB;
-  --accent:#1D4FD7; --accent-ink:#FFFFFF; --award:#7A5B00; --award-bg:#F6E7B4;
-  --g-lit:#3B5BA9; --g-fan:#7A4EA3; --g-rom:#C2456B; --g-thr:#A63D2F; --g-his:#8A6D1F;
-  --g-sci:#0F8A8A; --g-hor:#5D4037; --g-ya:#D08A12; --g-non:#3E7D4F; --g-non2:#2F6F8F; --g-non3:#6B7F2A; --g-kid:#E0649A;
+  /* Warm reading-nook palette: oatmeal paper, cocoa ink, cranberry accent. */
+  --paper:#F5EADB; --surface:#FCF6EE; --ink:#3B2A21; --muted:#76594A; --line:#E0CCB6;
+  --accent:#8E2F3C; --accent-ink:#FFF7EE; --award:#734A00; --award-bg:#F2D9A6;
+  --g-lit:#475A8C; --g-fan:#77508E; --g-rom:#B04760; --g-thr:#9C3E2C; --g-his:#86651F;
+  --g-sci:#2F786C; --g-hor:#5D4037; --g-ya:#A3640C; --g-non:#4E7849; --g-non2:#3E687C; --g-non3:#677630; --g-kid:#B04D72;
   --display:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif;
   --body:"Newsreader",Georgia,"Times New Roman",serif;
 }
+/* Dark mode: fireside espresso with candlelight text. */
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --paper:#10171D; --surface:#17202A; --ink:#E8EDE9; --muted:#9AA8B2; --line:#2B3843;
-    --accent:#7FA2FF; --accent-ink:#0B1220; --award:#F2D675; --award-bg:#3A3112;
+    --paper:#1D1512; --surface:#2A1F1A; --ink:#F4E7D7; --muted:#C2A893; --line:#46352C;
+    --accent:#EC9A8F; --accent-ink:#2B1210; --award:#F3C873; --award-bg:#3E2D14; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --paper:#10171D; --surface:#17202A; --ink:#E8EDE9; --muted:#9AA8B2; --line:#2B3843;
-  --accent:#7FA2FF; --accent-ink:#0B1220; --award:#F2D675; --award-bg:#3A3112;
+  --paper:#1D1512; --surface:#2A1F1A; --ink:#F4E7D7; --muted:#C2A893; --line:#46352C;
+  --accent:#EC9A8F; --accent-ink:#2B1210; --award:#F3C873; --award-bg:#3E2D14; color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
