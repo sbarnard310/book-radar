@@ -19,6 +19,7 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections import Counter
 from datetime import date
 
 API = "https://www.googleapis.com/books/v1/volumes"
@@ -43,14 +44,23 @@ SUBJECTS = {
 LANGS = ["en", "es", "fr", "de", "pt"]
 EASY_GENRES = {"Romance", "Thriller & mystery"}
 NONFICTION = {"Memoir & biography", "History & politics", "Science & nature"}
+# Refuse to replace books.json with a suspiciously small result.
+MIN_BOOKS = 50
 
 
 def get(params):
     if KEY:
         params["key"] = KEY
     url = f"{API}?{urllib.parse.urlencode(params)}"
-    with urllib.request.urlopen(url, timeout=20) as r:
-        return json.load(r)
+    # Google Books answers bursts with 429/503; back off and retry.
+    for wait in (2, 5, 15, None):
+        try:
+            with urllib.request.urlopen(url, timeout=20) as r:
+                return json.load(r)
+        except urllib.error.HTTPError as err:
+            if err.code not in (429, 500, 503) or wait is None:
+                raise
+            time.sleep(wait)
 
 
 def normalise(item, genre):
@@ -84,6 +94,7 @@ def normalise(item, genre):
 def fetch_all():
     year = date.today().year
     seen, books = set(), []
+    stats, years = Counter(), Counter()
     for lang in LANGS:
         for genre, q in SUBJECTS.items():
             for start in (0, 40):  # two pages of 40 per query
@@ -94,20 +105,31 @@ def fetch_all():
                     })
                 except (urllib.error.URLError, TimeoutError) as err:
                     print(f"Skipping {genre}/{lang}/{start}: {err}", file=sys.stderr)
+                    stats["failed requests"] += 1
                     continue
-                for item in data.get("items", []):
+                items = data.get("items", [])
+                stats["items returned"] += len(items)
+                for item in items:
+                    years[(item.get("volumeInfo", {}).get("publishedDate") or "none")[:4]] += 1
                     b = normalise(item, genre)
                     if not b or not b["t"]:
+                        stats["dropped: year-only or missing date"] += 1
                         continue
                     # Keep this year and next, which covers "coming soon".
                     if not b["d"][:4] in (str(year), str(year + 1)):
+                        stats["dropped: outside this year and next"] += 1
                         continue
                     key = (b["t"].lower(), b["a"].lower())
                     if key in seen:
+                        stats["dropped: duplicate"] += 1
                         continue
                     seen.add(key)
                     books.append(b)
-                time.sleep(0.3)  # be polite to the API
+                    stats["kept"] += 1
+                time.sleep(1)  # be polite to the API
+    for k, v in stats.items():
+        print(f"{k}: {v}")
+    print("Publication years returned:", ", ".join(f"{y} x{n}" for y, n in years.most_common(12)))
     return books
 
 
@@ -126,9 +148,9 @@ def merge_awards(books, path="awards.json"):
 
 if __name__ == "__main__":
     books = merge_awards(fetch_all())
-    if not books:
-        # Don't overwrite the last good books.json with an empty result.
-        sys.exit("No books fetched; keeping the existing books.json")
+    if len(books) < MIN_BOOKS:
+        # Don't overwrite the last good books.json with a near-empty result.
+        sys.exit(f"Only {len(books)} books fetched (minimum {MIN_BOOKS}); keeping the existing books.json")
     books.sort(key=lambda b: b["d"])
     with open("books.json", "w", encoding="utf-8") as f:
         json.dump({"updated": date.today().isoformat(), "books": books},
