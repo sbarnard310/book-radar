@@ -1,15 +1,18 @@
-name: Update books
+name: Add covers
 
 on:
+  push:
+    branches: [main]
+    paths: [books.json]   # runs whenever the list changes
   schedule:
-    - cron: "0 5 * * *"   # every day at 05:00 UTC
+    - cron: "0 6 * * 1"   # and every Monday at 06:00 UTC, for covers that appear later
   workflow_dispatch:       # lets you run it by hand from the Actions tab
 
 permissions:
   contents: write
 
 jobs:
-  update:
+  covers:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,15 +21,13 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Fetch books
-        env:
-          GOOGLE_BOOKS_API_KEY: ${{ secrets.GOOGLE_BOOKS_API_KEY }}
-        run: python fetch_books.py
+      - name: Find missing covers
+        run: python add_covers.py
 
       - name: Commit updated books.json
         run: |
           git config user.name "book-radar-bot"
           git config user.email "actions@users.noreply.github.com"
           git add books.json
-          git diff --cached --quiet || git commit -m "Update books $(date -u +%F)"
+          git diff --cached --quiet || git commit -m "Add covers $(date -u +%F)"
           git push
