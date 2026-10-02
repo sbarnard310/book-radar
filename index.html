@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Book Radar: new and upcoming reads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --paper:#EEF1ED; --surface:#F8FAF7; --ink:#15202A; --muted:#556470; --line:#C9D2CB;
+  --accent:#1D4FD7; --accent-ink:#FFFFFF; --award:#7A5B00; --award-bg:#F6E7B4;
+  --g-lit:#3B5BA9; --g-fan:#7A4EA3; --g-rom:#C2456B; --g-thr:#A63D2F; --g-his:#8A6D1F;
+  --g-sci:#0F8A8A; --g-hor:#5D4037; --g-ya:#D08A12; --g-non:#3E7D4F; --g-non2:#2F6F8F; --g-non3:#6B7F2A; --g-kid:#E0649A;
+  --display:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif;
+  --body:"Newsreader",Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#10171D; --surface:#17202A; --ink:#E8EDE9; --muted:#9AA8B2; --line:#2B3843;
+    --accent:#7FA2FF; --accent-ink:#0B1220; --award:#F2D675; --award-bg:#3A3112;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#10171D; --surface:#17202A; --ink:#E8EDE9; --muted:#9AA8B2; --line:#2B3843;
+  --accent:#7FA2FF; --accent-ink:#0B1220; --award:#F2D675; --award-bg:#3A3112;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.5}
+.wrap{max-width:860px;margin:0 auto;padding:28px 18px 64px}
+h1,h2,h3{font-family:var(--display);margin:0;font-weight:700;letter-spacing:-.01em}
+.hero{padding:12px 0 22px;border-bottom:2px solid var(--ink)}
+.hero h1{font-size:clamp(34px,7.5vw,60px);line-height:1.03;max-width:16ch}
+.hero p{margin:14px 0 0;max-width:46ch;color:var(--muted);font-size:19px}
+.hero b{color:var(--ink);font-weight:500}
+.controls{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding:10px 0;border-bottom:1px solid var(--line)}
+.bar{display:flex;gap:8px;align-items:center}
+.toggle{font:500 15px var(--display);color:var(--ink);background:var(--surface);border:1.5px solid var(--ink);border-radius:8px;padding:0 14px;min-height:42px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.toggle::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .15s}
+.toggle[aria-expanded="true"]{background:var(--ink);color:var(--paper)}
+.toggle[aria-expanded="true"]::after{transform:rotate(-135deg) translateY(-2px)}
+.badge{background:var(--accent);color:var(--accent-ink);border-radius:99px;font:700 12px var(--display);min-width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.badge[hidden]{display:none}
+.panel{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);max-height:calc(100dvh - 140px);overflow-y:auto;overscroll-behavior:contain}
+.panel[hidden]{display:none}
+.actions{position:sticky;bottom:0;background:var(--paper);padding:10px 0 2px;justify-content:space-between}
+.btn{font:500 15px var(--display);border-radius:8px;padding:10px 16px;min-height:42px;cursor:pointer;border:1.5px solid var(--ink);background:transparent;color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row + .row{margin-top:10px}
+.seg{display:inline-flex;border:1.5px solid var(--ink);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--ink);font:500 15px var(--display);padding:9px 14px;cursor:pointer}
+.seg button+button{border-left:1.5px solid var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+input[type=search],select{font:400 16px var(--body);color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:9px 12px;min-height:42px}
+input[type=search]{flex:1 1 180px;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:500 14px var(--display);padding:6px 11px;border-radius:99px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.chip i{width:9px;height:9px;border-radius:50%;background:var(--c,var(--muted));display:inline-block}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip[aria-pressed="true"] i{box-shadow:0 0 0 2px var(--accent-ink)}
+.label{font:500 14px var(--display);color:var(--muted);margin-right:2px}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.count{margin:16px 0 0;color:var(--muted);font-size:16px}
+.group{margin-top:26px}
+.group h2{font-size:22px;padding-bottom:6px;border-bottom:1.5px solid var(--ink);display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.group h2 small{font:400 15px var(--body);color:var(--muted)}
+ul{list-style:none;margin:0;padding:0}
+.book{display:grid;grid-template-columns:6px 64px 1fr auto;gap:0 14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.spine{background:var(--spine,var(--muted));border-radius:2px}
+.book h3{font-size:20px;line-height:1.2}
+.by{margin:2px 0 0;font-size:17px}
+.note{margin:6px 0 0;color:var(--muted);font-size:16px;max-width:58ch}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{font:500 13px var(--display);border:1.2px solid var(--line);border-radius:5px;padding:2px 7px;color:var(--muted)}
+.tag.genre{color:var(--ink)}
+.tag.award{background:var(--award-bg);border-color:transparent;color:var(--award)}
+.when{text-align:right;font:500 14px var(--display);color:var(--ink);white-space:nowrap;padding-top:3px}
+.when span{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+.empty{padding:40px 0;color:var(--muted);text-align:center}
+footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:15px}
+footer p{margin:0 0 8px;max-width:64ch}
+.savedbtn{font:500 15px var(--display);color:var(--ink);background:var(--surface);border:1.5px solid var(--ink);border-radius:8px;padding:0 12px;min-height:42px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.savedbtn[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.heart path{fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+.save{border:0;background:transparent;color:var(--muted);cursor:pointer;width:44px;height:44px;margin:-10px -10px 0 auto;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.save[aria-pressed="true"]{color:#D6336C}
+.save[aria-pressed="true"] .heart path,.savedbtn .heart.on path{fill:currentColor}
+.copyrow{margin:10px 0 0}
+.copyrow[hidden]{display:none}
+.cover{width:64px;height:96px;position:relative;border-radius:3px;overflow:hidden;background:var(--line);box-shadow:0 1px 4px rgba(0,0,0,.28)}
+.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ph{position:absolute;inset:0;display:flex;align-items:flex-end;padding:6px;color:#fff}
+.ph[hidden]{display:none}
+.ph b{font:700 10px/1.15 var(--display);display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.rate{margin:4px 0 0;font:500 14px var(--display);display:flex;align-items:center;gap:5px}
+.rate svg{color:#E0A100}
+.rate span{color:var(--muted);font-weight:400}
+.part{font-size:30px;margin-top:40px;padding-bottom:8px;border-bottom:3px solid var(--ink);display:flex;justify-content:space-between;align-items:baseline}
+.part small{font:400 16px var(--body);color:var(--muted)}
+.buy{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.buy a{font:500 14px var(--display);color:var(--ink);text-decoration:none;border:1.5px solid var(--ink);border-radius:8px;padding:8px 12px;min-height:40px;display:inline-flex;align-items:center}
+.buy a:hover{background:var(--ink);color:var(--paper)}
+.buy a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.news{margin-top:44px;padding:20px;border:1.5px solid var(--ink);border-radius:10px;background:var(--surface)}
+.news h2{font-size:22px}
+.news p{margin:8px 0 0;color:var(--muted);max-width:50ch}
+.news form{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.news input[type=email]{flex:1 1 200px;min-width:0;font:400 16px var(--body);color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:8px;padding:9px 12px;min-height:44px}
+.news input[type=email]:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#newsMsg{min-height:1.4em;margin-top:8px;font-size:15px}
+@media (max-width:520px){
+  .when .save{order:2;margin:-12px -10px -12px auto}
+  body{font-size:17px}
+  .book{grid-template-columns:6px 64px 1fr}
+  .when{grid-column:2 / -1;text-align:left;margin-top:8px;display:flex;gap:8px;white-space:normal}
+  .when span{margin:0}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1 id="headline">Book Radar</h1>
+    <p id="sub"></p>
+  </header>
+
+  <section class="controls" aria-label="Search and filters">
+    <div class="bar">
+      <input id="q" type="search" placeholder="Search title or author" aria-label="Search title or author">
+      <button type="button" id="savedBtn" class="savedbtn" aria-pressed="false" aria-label="Wishlist"><svg class="heart" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 20.5s-7.500-4.600-9.200-9.400C1.600 7.700 3.700 4.500 7 4.500c2 0 3.700 1.100 5 3 1.300-1.900 3-3 5-3 3.300 0 5.400 3.200 4.200 6.600-1.700 4.800-9.200 9.400-9.200 9.400z"/></svg><span id="savedN">0</span></button>
+      <button type="button" id="toggle" class="toggle" aria-expanded="false" aria-controls="panel">Filters <span id="badge" class="badge" hidden>0</span></button>
+    </div>
+    <div id="panel" class="panel" hidden>
+      <div class="row">
+        <div class="seg" id="viewSeg" role="group" aria-label="Release status">
+          <button type="button" data-view="soon" aria-pressed="true">Coming soon</button>
+          <button type="button" data-view="out" aria-pressed="false">Out now</button>
+          <button type="button" data-view="all" aria-pressed="false">All</button>
+        </div>
+      </div>
+      <div class="row">
+        <span class="label">Type</span>
+        <div class="seg" id="typeSeg" role="group" aria-label="Fiction or nonfiction">
+          <button type="button" data-type="all" aria-pressed="true">Both</button>
+          <button type="button" data-type="Fiction" aria-pressed="false">Fiction</button>
+          <button type="button" data-type="Nonfiction" aria-pressed="false">Nonfiction</button>
+        </div>
+      </div>
+      <div class="row">
+        <label class="label" for="grp">Group by</label>
+        <select id="grp">
+          <option value="date">Release date</option>
+          <option value="author">Author</option>
+          <option value="genre">Genre</option>
+        </select>
+        <label class="label" for="sort">Sort by</label>
+        <select id="sort">
+          <option value="date">Date</option>
+          <option value="rating">Highest rated</option>
+        </select>
+      </div>
+      <div class="row">
+        <span class="label">Collection</span>
+        <div class="chips" id="collections" role="group" aria-label="Collection"></div>
+      </div>
+      <div class="row">
+        <span class="label">Genre</span>
+        <div class="chips" id="genres" role="group" aria-label="Genre"></div>
+      </div>
+      <div class="row actions">
+        <button type="button" class="btn" id="clear">Clear filters</button>
+        <button type="button" class="btn primary" id="done">Show books</button>
+      </div>
+    </div>
+  </section>
+
+  <p class="count" id="count" aria-live="polite"></p>
+  <p class="copyrow" id="copyrow" hidden><button type="button" class="btn" id="copy">Copy my wishlist</button></p>
+  <main id="list"></main>
+
+  <section class="news" aria-labelledby="newsH">
+    <h2 id="newsH">New releases in your inbox</h2>
+    <p>One short email a week: what's out, what's coming, and what's won a prize.</p>
+    <form id="newsForm" method="post" target="_blank" novalidate>
+      <input type="email" name="email" id="newsEmail" placeholder="Your email address" aria-label="Email address" autocomplete="email" required>
+      <button type="submit" class="btn primary">Subscribe</button>
+    </form>
+    <p id="newsMsg" aria-live="polite"></p>
+  </section>
+
+  <footer>
+    <p><b>About this data.</b> <span id="src">Snapshot compiled on 1 October 2026 from publisher and review-site release lists, the Booker Prizes and the Pulitzer Prizes.</span> Release dates can move, and some titles list only a month.</p>
+    <p><b>Wishlist.</b> Saved books are kept in this browser on this device only. Use Copy my wishlist to take the list with you.</p>
+    <p><b>Covers and ratings.</b> Where shown, they come from Google Books and Open Library. Many new and upcoming books have no ratings yet, so those show none.</p>
+    <p><b>Buy links.</b> Links to Bookshop.org and Amazon may be affiliate links. If you buy through them, this site may earn a small commission at no extra cost to you.</p>
+    <p><b>Easy reads</b> is an editorial tag for fast, accessible commercial fiction: thrillers, cozy mysteries, romance and picture books. It is not a measured reading level.</p>
+    <p id="scope">This is a hand-built sample of 61 titles, mostly English-language with six translated titles from the International Booker. A live version would pull from book databases on a schedule.</p>
+  </footer>
+</div>
+
+<script>
+// ---- CONFIG: fill these in before launching ----
+const CONFIG = {
+  region: "uk",            // "uk" or "us": picks Bookshop and Amazon storefronts
+  bookshopId: "",          // your Bookshop.org affiliate ID (works on ISBN links)
+  amazonTag: "",           // your Amazon Associates tracking ID, e.g. "yoursite-21"
+  newsletterUsername: ""   // your Buttondown username, e.g. "bookradar"
+};
+
+// [title, author, genre, date (YYYY-MM-DD or YYYY-MM or null), tags, award, note, original language]
+let B = [
+// ---- Out now ----
+["Taiwan Travelogue","Yáng Shuāng-zǐ","Literary fiction",null,["award","translated"],"International Booker 2026 winner","A love story between two women, set inside an exploration of language, history and power.","Mandarin"],
+["The Director","Daniel Kehlmann","Literary fiction",null,["award","translated"],"International Booker 2026 shortlist","","German"],
+["She Who Remains","Rene Karabash","Literary fiction",null,["award","translated"],"International Booker 2026 shortlist","","Bulgarian"],
+["The Nights Are Quiet in Tehran","Shida Bazyar","Literary fiction",null,["award","translated"],"International Booker 2026 shortlist","","German"],
+["On Earth as It Is Beneath","Ana Paula Maia","Literary fiction",null,["award","translated"],"International Booker 2026 shortlist","","Portuguese"],
+["The Witch","Marie NDiaye","Literary fiction",null,["award","translated"],"International Booker 2026 shortlist","","French"],
+["Angel Down","Daniel Kraus","Historical fiction",null,["award"],"Pulitzer Prize for Fiction 2026 winner","Five World War I soldiers find a fallen angel in No Man's Land. Told in a single sentence.",""],
+["Audition","Katie Kitamura","Literary fiction",null,["award"],"Pulitzer Prize for Fiction 2026 finalist","",""],
+["Stag Dance","Torrey Peters","Literary fiction",null,["award"],"Pulitzer Prize for Fiction 2026 finalist","",""],
+["The Disappearers","Marlon James","Literary fiction","2026-09-08",["award"],"Booker Prize 2026 shortlist","",""],
+["John of John","Douglas Stuart","Literary fiction",null,["award"],"Booker Prize 2026 shortlist","",""],
+["The Things We Never Say","Elizabeth Strout","Literary fiction",null,["award"],"Booker Prize 2026 shortlist","",""],
+["Black Bag","Luke Kennard","Literary fiction",null,["award"],"Booker Prize 2026 shortlist","",""],
+["May We Feed the King","Rebecca Perry","Literary fiction","2026-09-29",["award","debut"],"Booker Prize 2026 shortlist","The only debut novel on this year's Booker shortlist.",""],
+["Exit Party","Emily St. John Mandel","Literary fiction","2026-09-15",[],"","Fractured timelines, shadow worlds and mysterious doubles. Top pick on the September Indie Next list.",""],
+["Under Story","Chloe Benjamin","Literary fiction","2026-09-01",[],"","A love story and a sweeping odyssey of scientific discovery.",""],
+["Taipei Story","R. F. Kuang","Literary fiction","2026-09-08",[],"","",""],
+["Hollywood, Ending","John Green","Literary fiction","2026-09",[],"","Two friends cast in an Andy Warhol biopic find their lives changing.",""],
+["Hollow Bones","Jodi Picoult","Literary fiction","2026-09",[],"","",""],
+["Contrapposto","Dave Eggers","Literary fiction","2026-06-09",[],"","432 pages, published by Knopf.",""],
+["The Pirate Queen","Ariel Lawhon","Historical fiction","2026-09-08",[],"","Inspired by the Irish pirate Grace O'Malley.",""],
+["Scion","James Islington","Fantasy","2026-09-01",[],"","",""],
+["The Knave and the Moon","Rachel Gillig","Fantasy","2026-09",["bestseller"],"","Gothic romantasy sequel to The Knight and the Moth. Reached #1 on the NYT fiction list.",""],
+["Dead Beat","Leigh Bardugo","Fantasy","2026-09",[],"","",""],
+["The Wretched Divine","Adalyn Grace","Fantasy","2026-09",[],"","An ancient war between angels and demons, and a knight determined to end it.",""],
+["Threshing Day","Rebecca Yarros","Fantasy","2026-09",[],"","Thirteen stories starring Empyrean characters and their dragons.",""],
+["Murder at the Grand Alpine Hotel","Lucy Foley","Thriller & mystery","2026-09",["easy"],"","A new Miss Marple mystery.",""],
+["Target Down","Ryan Steck","Thriller & mystery","2026-09-08",["easy"],"","Matthew Redd thriller #5.",""],
+["Heart of Thieves","Jessica S. Olson","Young adult","2026-09-15",[],"","",""],
+["Gruffalo Granny","Julia Donaldson","Children's","2026-09-10",["easy"],"","The first new Gruffalo book in over 20 years, illustrated by Axel Scheffler.",""],
+
+// ---- Coming soon ----
+["Life Out of Order","Audrey Niffenegger","Science fiction","2026-10-06",[],"","Henry and Clare's daughter inherits the ability to move through time.",""],
+["Every Story Is a Love Story","Imbolo Mbue","Literary fiction","2026-10-06",[],"","",""],
+["Friends and Family","Natalie Baszile","Literary fiction","2026-10-06",[],"","Two best friends clash over race, identity and allyship.",""],
+["Partita","Barbara Kingsolver","Literary fiction","2026-10-06",[],"","",""],
+["The Names of the New World","Kawai Strong Washburn","Literary fiction","2026-10-06",[],"","",""],
+["Carrying","Samantha Josephs","Horror","2026-10-06",["debut"],"","Funny and harrowing horror debut about an impossible pregnancy.",""],
+["The Witch","Freida McFadden","Thriller & mystery","2026-10-06",["easy"],"","A seasonal thriller that leans into atmosphere and history.",""],
+["Victorious","V. E. Schwab","Fantasy","2026-10-06",[],"","",""],
+["The Scarlet Ball","Nghi Vo","Fantasy","2026-10-06",[],"","",""],
+["The Sixth Faction","Veronica Roth","Young adult","2026-10-06",[],"","A return to Divergent, exploring what if Tris had chosen differently.",""],
+["Bad Words","Rioghnach Robinson","Romance","2026-10-06",["easy"],"","",""],
+["Vengefully Matched","Audrey Goldberg Ruoff","Romance","2026-10-06",["easy"],"","A fake-dating deal between a runaway bride and her witch council's new president.",""],
+["A Pinch of Magic","Emily Heil","Romance","2026-10-06",["easy"],"","",""],
+["Blockers: Rebels in the Deep State","Michael Lewis","History & politics","2026-10-06",[],"","The civil service meets the second Trump administration.",""],
+["Rottenheart","Kat Dunn","Horror","2026-10-13",[],"","",""],
+["The End of Everything","M. John Harrison","Literary fiction","2026-10-13",["award"],"Booker Prize 2026 shortlist","Published by Riverhead. Winner announced 9 November.",""],
+["Royal Witch","Philippa Gregory","Historical fiction","2026-10-20",[],"","The story of Eleanor Cobham, imprisoned after a forced divorce.",""],
+["Crash Course","Piper Lawson","Romance","2026-10-20",["easy"],"","",""],
+["The Tarot Trials","Katee Robert","Fantasy","2026-10-20",[],"","",""],
+["A Court of Splintered Harmony","Sarah J. Maas","Fantasy","2026-10-27",[],"","The sixth novel in A Court of Thorns and Roses.",""],
+["Public Access Afterworld","Jane Schoenbrun","Science fiction","2026-10-27",["debut"],"","Debut novel from the filmmaker.",""],
+["Whale Harbor","Mary Beth Keane","Literary fiction","2026-11-03",[],"","Eleven brothers and one family mystery, from Ireland in the 1960s across decades.",""],
+["The Last King of Faerie","Cassandra Clare","Young adult","2026-11-03",[],"","First book of The Wicked Powers, the final Shadowhunters trilogy.",""],
+["A Grim Reaper's Guide to Living Twice","Maxie Dara","Thriller & mystery","2026-11-03",["easy"],"","SCYTHE Mystery book 3.",""],
+["Peregrine Hill","Nina de Gramont","Historical fiction","2026-11-10",[],"","",""],
+["Prudence Marsh Is Not a Nobody Anymore","Emily Krempholtz","Fantasy","2026-11-10",[],"","",""],
+["Peculiar Stars","Rebecca Yarros","Fantasy","2026-11-17",[],"","",""],
+["Stormside","Alex Aster","Fantasy","2026-11-17",[],"","Book 2 in the Starside series.",""],
+["Birth of the Witch","Nora Roberts","Fantasy","2026-11",[],"","Reincarnation, witches and long-buried secrets.",""],
+["The Heist Before Christmas","Lucy Score","Romance","2026-11",["easy"],"","A Riley Thorn story: mystery, romance and chaos with a Christmas setting.",""],
+["Beneath a Midnight Moon","Catherine Cowles","Romance","2026-11",["easy"],"","An emotional small-town romance.",""]
+].map(([t,a,g,d,tags,aw,n,lang])=>({t,a,g,d,tags,aw,n,lang}));
+
+const GENRES = {
+  "Literary fiction":"--g-lit","Fantasy":"--g-fan","Romance":"--g-rom","Thriller & mystery":"--g-thr",
+  "Historical fiction":"--g-his","Science fiction":"--g-sci","Horror":"--g-hor","Young adult":"--g-ya",
+  "Memoir & biography":"--g-non","History & politics":"--g-non2","Science & nature":"--g-non3","Children's":"--g-kid"
+};
+const NONFICTION=new Set(["Memoir & biography","History & politics","Science & nature"]);
+const typeOf=b=>NONFICTION.has(b.g)?"Nonfiction":"Fiction";
+const COLLECTIONS = [
+  ["all","Everything"],["award","Award-winning"],["easy","Easy reads"],
+  ["debut","Debuts"],["translated","Translated"],["bestseller","Bestsellers"]
+];
+
+const MS = 86400000;
+const today = new Date(); today.setHours(0,0,0,0);
+const state = {view:"soon", coll:"all", genre:"all", q:"", grp:"date", saved:false, type:"all", sort:"date"};
+
+// ---- date helpers ----
+function parse(b){
+  if(!b.d) return {kind:"none", out:true};
+  if(b.d.length===7){
+    const [y,m]=b.d.split("-").map(Number);
+    const start=new Date(y,m-1,1), end=new Date(y,m,0);
+    return {kind:"month", start, end, out: end < today, sortKey:end.getTime()};
+  }
+  const [y,m,d]=b.d.split("-").map(Number);
+  const dt=new Date(y,m-1,d);
+  return {kind:"day", dt, out: dt <= today, sortKey:dt.getTime()};
+}
+const prep=list=>{list.forEach(b=>b.p=parse(b));return list;};
+prep(B);
+const fmtFull=d=>d.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});
+const fmtShort=d=>d.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});
+const fmtMonth=d=>d.toLocaleDateString(undefined,{month:"long",year:"numeric"});
+function rel(dt){
+  const n=Math.round((dt-today)/MS);
+  if(n===0) return "out today";
+  if(n===1) return "tomorrow";
+  if(n>1) return `in ${n} days`;
+  return "";
+}
+function whenOf(b){
+  const p=b.p;
+  if(p.kind==="day") return {a: p.out? fmtShort(p.dt): fmtShort(p.dt), b: p.out? "": rel(p.dt)};
+  if(p.kind==="month") return {a: fmtMonth(p.start), b: p.out? "": "date to be confirmed"};
+  return {a:"Date not listed", b:"published 2025–26"};
+}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// ---- wishlist (kept in this browser only) ----
+const WKEY="bookradar:wishlist";
+const bid=b=>(b.t+"|"+b.a).toLowerCase();
+const wish=new Map();
+try{ JSON.parse(localStorage.getItem(WKEY)||"[]").forEach(b=>{b.p=parse(b);wish.set(bid(b),b);}); }catch(e){}
+function persist(){
+  try{ localStorage.setItem(WKEY,JSON.stringify([...wish.values()].map(({p,...r})=>r))); }catch(e){}
+}
+const HEART='<svg class="heart" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 20.5s-7.500-4.600-9.200-9.400C1.600 7.700 3.700 4.500 7 4.500c2 0 3.700 1.100 5 3 1.300-1.900 3-3 5-3 3.300 0 5.400 3.200 4.200 6.600-1.700 4.800-9.200 9.400-9.200 9.400z"/></svg>';
+
+// ---- filtering ----
+function visible(){
+  const q=state.q.trim().toLowerCase();
+  const pool=state.saved ? [...wish.values()].map(w=>B.find(b=>bid(b)===bid(w))||w) : B;
+  return pool.filter(b=>{
+    if(!state.saved && state.view==="soon" && b.p.out) return false;
+    if(!state.saved && state.view==="out" && !b.p.out) return false;
+    if(state.type!=="all" && typeOf(b)!==state.type) return false;
+    if(state.coll!=="all" && !b.tags.includes(state.coll)) return false;
+    if(state.genre!=="all" && b.g!==state.genre) return false;
+    if(q && !(b.t.toLowerCase().includes(q) || b.a.toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+
+// ---- grouping ----
+function cmp(a,b){
+  if(state.sort==="rating"){ const d=(b.rating||-1)-(a.rating||-1); if(d) return d; }
+  const ka=a.p.sortKey??0, kb=b.p.sortKey??0;
+  if(state.view==="out") return kb-ka || a.t.localeCompare(b.t);
+  return ka-kb || a.t.localeCompare(b.t);
+}
+function lastName(n){const w=n.split(" ");return w[w.length-1];}
+function group(list){
+  const groups=new Map();
+  const add=(key,label,sub,sort,b)=>{
+    if(!groups.has(key)) groups.set(key,{label,sub,sort,items:[]});
+    groups.get(key).items.push(b);
+  };
+  list.forEach(b=>{
+    if(state.grp==="author") add(b.a,b.a,"",lastName(b.a).toLowerCase(),b);
+    else if(state.grp==="genre") add(b.g,b.g,"",b.g,b);
+    else{
+      const p=b.p;
+      if(p.kind==="day"){
+        if(!p.out) add("d"+p.sortKey,fmtFull(p.dt),rel(p.dt),p.sortKey,b);
+        else{
+          const k=p.dt.getFullYear()*100+p.dt.getMonth();
+          add("m"+k,fmtMonth(p.dt),"",new Date(p.dt.getFullYear(),p.dt.getMonth()+1,0).getTime(),b);
+        }
+      } else if(p.kind==="month"){
+        const k=p.start.getFullYear()*100+p.start.getMonth();
+        add("m"+k,fmtMonth(p.start)+(p.out?"":", exact date to be confirmed"),"",p.end.getTime()+MS/2,b);
+      } else add("none","Published 2025–26, date not listed","",-1,b);
+    }
+  });
+  let arr=[...groups.values()];
+  if(state.grp==="date"){
+    arr.sort((x,y)=> state.view==="out" ? y.sort-x.sort : x.sort-y.sort);
+    const none=arr.findIndex(g=>g.sort===-1);
+    if(none>-1){const [g]=arr.splice(none,1);arr.push(g);}
+  } else arr.sort((x,y)=>String(x.sort).localeCompare(String(y.sort)));
+  arr.forEach(g=>g.items.sort(cmp));
+  return arr;
+}
+
+// ---- render ----
+function coverURL(b){
+  return b.cover || (b.isbn ? `https://covers.openlibrary.org/b/isbn/${encodeURIComponent(b.isbn)}-M.jpg?default=false` : "");
+}
+function coverHTML(b,color){
+  const ph=`<span class="ph" style="background:${color}"><b>${esc(b.t)}</b></span>`;
+  const u=coverURL(b);
+  return `<div class="cover">${ph}${u?`<img src="${esc(u)}" alt="Cover of ${esc(b.t)}" width="64" height="96" loading="lazy" referrerpolicy="no-referrer">`:""}</div>`;
+}
+function ratingHTML(b){
+  if(!b.rating) return "";
+  const n=b.ratings?` <span>(${Number(b.ratings).toLocaleString()})</span>`:"";
+  return `<p class="rate" aria-label="Rated ${b.rating} out of 5${b.ratings?" from "+b.ratings+" ratings":""}"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M12 2.500l2.900 6 6.600.9-4.800 4.600 1.200 6.500L12 17.400l-5.900 3.100 1.200-6.500L2.500 9.400l6.600-.9z"/></svg>${Number(b.rating).toFixed(1)}${n}</p>`;
+}
+function buyHTML(b){
+  const uk=CONFIG.region==="uk";
+  const bsHost=uk?"https://uk.bookshop.org":"https://bookshop.org";
+  const amHost=uk?"https://www.amazon.co.uk":"https://www.amazon.com";
+  const q=encodeURIComponent(b.isbn||`${b.t} ${b.a}`);
+  const bs=(b.isbn&&CONFIG.bookshopId)
+    ? `${bsHost}/a/${encodeURIComponent(CONFIG.bookshopId)}/${encodeURIComponent(b.isbn)}`
+    : `${bsHost}/search?keywords=${q}`;
+  const am=`${amHost}/s?k=${q}&i=stripbooks`+(CONFIG.amazonTag?`&tag=${encodeURIComponent(CONFIG.amazonTag)}`:"");
+  const a=(href,label)=>`<a href="${esc(href)}" target="_blank" rel="sponsored noopener noreferrer" aria-label="Buy ${esc(b.t)} on ${label}">${label}</a>`;
+  return `<div class="buy">${a(bs,"Bookshop")}${a(am,"Amazon")}</div>`;
+}
+function bookHTML(b){
+  const w=whenOf(b);
+  const color=`var(${GENRES[b.g]||"--muted"})`;
+  const tags=[`<span class="tag genre">${esc(b.g)}</span>`];
+  if(b.aw) tags.push(`<span class="tag award">${esc(b.aw)}</span>`);
+  if(b.tags.includes("easy")) tags.push(`<span class="tag">Easy read</span>`);
+  if(b.tags.includes("debut")) tags.push(`<span class="tag">Debut</span>`);
+  if(b.tags.includes("bestseller")) tags.push(`<span class="tag">Bestseller</span>`);
+  if(b.lang) tags.push(`<span class="tag">Translated from ${esc(b.lang)}</span>`);
+  const on=wish.has(bid(b));
+  return `<li class="book" style="--spine:${color}">
+    <div class="spine" aria-hidden="true"></div>
+    ${coverHTML(b,color)}
+    <div>
+      <h3>${esc(b.t)}</h3>
+      <p class="by">${esc(b.a)}</p>
+      ${ratingHTML(b)}
+      ${b.n?`<p class="note">${esc(b.n)}</p>`:""}
+      <div class="tags">${tags.join("")}</div>
+      ${buyHTML(b)}
+    </div>
+    <div class="when"><button type="button" class="save" data-id="${esc(bid(b))}" aria-pressed="${on}" aria-label="${on?"Remove from wishlist":"Save to wishlist"}: ${esc(b.t)}">${HEART}</button>${esc(w.a)}${w.b?`<span>${esc(w.b)}</span>`:""}</div>
+  </li>`;
+}
+function render(){
+  const list=visible();
+  const el=document.getElementById("list");
+  document.getElementById("count").textContent=state.saved ? `${list.length} saved ${list.length===1?"book":"books"}` : `${list.length} ${list.length===1?"book":"books"}`;
+  document.getElementById("copyrow").hidden=!(state.saved && list.length);
+  document.getElementById("done").textContent=`Show ${list.length} ${list.length===1?"book":"books"}`;
+  const n=(state.view!=="soon")+(state.coll!=="all")+(state.genre!=="all")+(state.grp!=="date")+(state.type!=="all")+(state.sort!=="date");
+  const badge=document.getElementById("badge"); badge.textContent=n; badge.hidden=!n;
+  if(!list.length){
+    el.innerHTML=state.saved && !wish.size
+      ? `<p class="empty">Nothing saved yet. Tap the heart on any book to add it here.</p>`
+      : `<p class="empty">No books match these filters. Try clearing the search or choosing a different collection.</p>`;
+    return;
+  }
+  const sec=g=>`<section class="group"><h2>${esc(g.label)}<small>${esc(g.sub)}</small></h2><ul>${g.items.map(bookHTML).join("")}</ul></section>`;
+  const parts=state.type==="all"
+    ? [["Fiction",list.filter(b=>typeOf(b)==="Fiction")],["Nonfiction",list.filter(b=>typeOf(b)==="Nonfiction")]].filter(x=>x[1].length)
+    : [[null,list]];
+  el.innerHTML=parts.map(([name,items])=>(name?`<h2 class="part">${name}<small>${items.length}</small></h2>`:"")+group(items).map(sec).join("")).join("");
+}
+function hero(){
+  const soon=B.filter(b=>!b.p.out);
+  const dated=soon.filter(b=>b.p.kind==="day").sort((a,b)=>a.p.sortKey-b.p.sortKey);
+  const h=document.getElementById("headline"), s=document.getElementById("sub");
+  if(dated.length){
+    const next=dated[0].p.dt;
+    const n=dated.filter(b=>b.p.sortKey===next.getTime()).length;
+    const d=Math.round((next-today)/MS);
+    h.textContent=`${soon.length} books on the way. ${d<=0?"Some land today":d===1?"The next land tomorrow":"The next land in "+d+" days"}.`;
+    s.innerHTML=`<b>${n} ${n===1?"title":"titles"}</b> publish on ${fmtFull(next)}. Browse what's coming, what just came out, and what's won prizes.`;
+  } else {
+    h.textContent="Book Radar";
+    s.textContent="Browse new releases and award-winning fiction.";
+  }
+}
+
+// ---- controls ----
+function chips(id,items,key){
+  const box=document.getElementById(id);
+  box.innerHTML=items.map(([v,l])=>{
+    const c = key==="genre" && GENRES[v] ? ` style="--c:var(${GENRES[v]})"` : "";
+    return `<button type="button" class="chip" data-${key}="${esc(v)}" aria-pressed="${state[key==="coll"?"coll":"genre"]===v}"${c}>${key==="genre"&&GENRES[v]?"<i></i>":""}${esc(l)}</button>`;
+  }).join("");
+  box.addEventListener("click",e=>{
+    const btn=e.target.closest("button"); if(!btn) return;
+    state[key==="coll"?"coll":"genre"]=btn.dataset[key];
+    box.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===btn));
+    render();
+  });
+}
+chips("collections",COLLECTIONS,"coll");
+chips("genres",[["all","All genres"],...Object.keys(GENRES).map(g=>[g,g])],"genre");
+document.getElementById("viewSeg").addEventListener("click",e=>{
+  const btn=e.target.closest("button"); if(!btn) return;
+  state.view=btn.dataset.view;
+  document.querySelectorAll("#viewSeg button").forEach(x=>x.setAttribute("aria-pressed",x===btn));
+  render();
+});
+document.getElementById("q").addEventListener("input",e=>{state.q=e.target.value;render();});
+document.getElementById("grp").addEventListener("change",e=>{state.grp=e.target.value;render();});
+
+function updateSaved(){
+  document.getElementById("savedN").textContent=wish.size;
+  document.querySelector("#savedBtn .heart").classList.toggle("on",state.saved||wish.size>0);
+}
+document.getElementById("savedBtn").addEventListener("click",e=>{
+  state.saved=!state.saved;
+  e.currentTarget.setAttribute("aria-pressed",state.saved);
+  setOpen(false);
+  render();
+  window.scrollTo({top:0});
+});
+document.getElementById("list").addEventListener("click",e=>{
+  const btn=e.target.closest(".save"); if(!btn) return;
+  const k=btn.dataset.id;
+  const bk=B.find(b=>bid(b)===k)||wish.get(k);
+  if(!bk) return;
+  if(wish.has(k)) wish.delete(k); else wish.set(k,bk);
+  persist(); updateSaved();
+  if(state.saved){ render(); }
+  else{
+    const on=wish.has(k);
+    btn.setAttribute("aria-pressed",on);
+    btn.setAttribute("aria-label",(on?"Remove from wishlist":"Save to wishlist")+": "+bk.t);
+  }
+});
+document.getElementById("copy").addEventListener("click",async e=>{
+  const lines=[...wish.values()].sort((a,b)=>(a.p.sortKey??1e15)-(b.p.sortKey??1e15)).map(b=>{
+    const w=whenOf(b); return `${b.t} by ${b.a} (${w.a})`;
+  });
+  try{ await navigator.clipboard.writeText(lines.join("\n")); e.target.textContent="Copied"; }
+  catch(err){ e.target.textContent="Copy not available here"; }
+  setTimeout(()=>{e.target.textContent="Copy my wishlist";},2000);
+});
+const toggle=document.getElementById("toggle"), panel=document.getElementById("panel");
+function setOpen(open){
+  toggle.setAttribute("aria-expanded",open);
+  panel.hidden=!open;
+}
+toggle.addEventListener("click",()=>setOpen(panel.hidden));
+document.getElementById("done").addEventListener("click",()=>{
+  setOpen(false);
+  document.getElementById("count").scrollIntoView({block:"start"});
+});
+document.getElementById("clear").addEventListener("click",()=>{
+  Object.assign(state,{view:"soon",coll:"all",genre:"all",grp:"date",type:"all",sort:"date"});
+  document.querySelectorAll("#viewSeg button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.view==="soon"));
+  document.querySelectorAll("#typeSeg button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.type==="all"));
+  document.getElementById("sort").value="date";
+  document.querySelectorAll("#collections button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.coll==="all"));
+  document.querySelectorAll("#genres button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.genre==="all"));
+  document.getElementById("grp").value="date";
+  render();
+});
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !panel.hidden){ setOpen(false); toggle.focus(); } });
+
+const nf=document.getElementById("newsForm"), nm=document.getElementById("newsMsg");
+nf.addEventListener("submit",e=>{
+  const email=document.getElementById("newsEmail");
+  if(!email.value || !email.checkValidity()){
+    e.preventDefault(); nm.textContent="Enter a valid email address."; email.focus(); return;
+  }
+  if(!CONFIG.newsletterUsername){
+    e.preventDefault();
+    nm.textContent="Signup isn't connected yet. The site owner needs to add a newsletter username in CONFIG.";
+    return;
+  }
+  nf.action="https://buttondown.com/api/emails/embed-subscribe/"+encodeURIComponent(CONFIG.newsletterUsername);
+  nm.textContent="Thanks. Check the new tab to confirm your subscription.";
+});
+
+document.getElementById("typeSeg").addEventListener("click",e=>{
+  const btn=e.target.closest("button"); if(!btn) return;
+  state.type=btn.dataset.type;
+  document.querySelectorAll("#typeSeg button").forEach(x=>x.setAttribute("aria-pressed",x===btn));
+  if(state.genre!=="all" && state.type!=="all" && (NONFICTION.has(state.genre)?"Nonfiction":"Fiction")!==state.type){
+    state.genre="all";
+    document.querySelectorAll("#genres button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.genre==="all"));
+  }
+  render();
+});
+document.getElementById("sort").addEventListener("change",e=>{state.sort=e.target.value;render();});
+// Cover images: hide the placeholder once a real cover loads, drop broken images.
+const listEl=document.getElementById("list");
+listEl.addEventListener("load",e=>{ if(e.target.tagName==="IMG"){ const ph=e.target.previousElementSibling; if(ph) ph.hidden=true; } },true);
+listEl.addEventListener("error",e=>{ if(e.target.tagName==="IMG") e.target.remove(); },true);
+
+// Live data: when this page is hosted next to a books.json file, use it.
+// Anywhere else (including this preview) the embedded snapshot above is used.
+function adapt(j){
+  return (j.books||[]).filter(x=>x.t&&x.d).map(x=>({
+    t:x.t,a:x.a,g:GENRES[x.g]?x.g:(x.type==="Nonfiction"?"History & politics":"Literary fiction"),d:x.d,
+    tags:[...(x.award?["award"]:[]),...(x.easy?["easy"]:[])],
+    aw:x.award||"",n:x.n||"",lang:"",isbn:x.isbn||"",cover:x.cover||"",rating:x.rating||0,ratings:x.ratings||0
+  }));
+}
+fetch("books.json",{cache:"no-store"})
+  .then(r=>r.ok?r.json():Promise.reject())
+  .then(j=>{
+    const live=adapt(j);
+    if(!live.length) return;
+    B=prep(live);
+    document.getElementById("src").textContent=`Live data, last updated ${j.updated||"recently"}.`;
+    document.getElementById("scope").textContent=`Showing ${live.length} new and upcoming titles from Google Books, refreshed daily. Prize badges are added by hand.`;
+    hero(); render();
+  })
+  .catch(()=>{});
+
+updateSaved();
+hero();
+render();
+</script>
+</body>
+</html>
