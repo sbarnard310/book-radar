@@ -197,7 +197,7 @@ footer p{margin:0 0 8px;max-width:64ch}
   <footer>
     <p><b>About this data.</b> <span id="src">Snapshot compiled on 1 October 2026 from publisher and review-site release lists, the Booker Prizes and the Pulitzer Prizes.</span> Release dates can move, and some titles list only a month.</p>
     <p><b>Wishlist.</b> Saved books are kept in this browser on this device only. Use Copy my wishlist to take the list with you.</p>
-    <p><b>Covers and ratings.</b> Where shown, they come from Google Books and Open Library. Many new and upcoming books have no ratings yet, so those show none.</p>
+    <p><b>Covers and ratings.</b> Covers come from Apple Books, Open Library and Google Books. Ratings come from Google Books. Many new and upcoming books have no ratings yet, so those show none.</p>
     <p><b>Buy links.</b> Links to Bookshop.org and Amazon may be affiliate links. If you buy through them, this site may earn a small commission at no extra cost to you.</p>
     <p><b>Easy reads</b> is an editorial tag for fast, accessible commercial fiction: thrillers, cozy mysteries, romance and picture books. It is not a measured reading level.</p>
     <p id="scope">This is a hand-built sample of 61 titles, mostly English-language with six translated titles from the International Booker. A live version would pull from book databases on a schedule.</p>
@@ -211,6 +211,67 @@ const CONFIG = {
   bookshopId: "",          // your Bookshop.org affiliate ID (works on ISBN links)
   amazonTag: "",           // your Amazon Associates tracking ID, e.g. "yoursite-21"
   newsletterUsername: ""   // your Buttondown username, e.g. "bookradar"
+};
+
+// Cover images for the snapshot, keyed by lowercase "title|author".
+// From Apple Books (original English edition) or Open Library; books without one show a coloured placeholder.
+const COVERS = {
+  "taiwan travelogue|yáng shuāng-zǐ":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/0e/7a/68/0e7a6891-d47c-c1eb-2233-215db19fedb5/9781644453162.jpg/300x300bb.jpg",
+  "the director|daniel kehlmann":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/55/cf/00/55cf000a-3750-b7d1-fc4c-57c9b3cbe57f/9781668087817.jpg/300x300bb.jpg",
+  "she who remains|rene karabash":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/56/45/82/5645829c-e464-eadb-aca2-d9ed96c10bd3/1063239337.jpg/300x300bb.jpg",
+  "the nights are quiet in tehran|shida bazyar":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/ba/c1/5d/bac15db3-dd11-d3ed-3b14-31236d575dae/9781761386008.jpg/300x300bb.jpg",
+  "on earth as it is beneath|ana paula maia":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/f1/81/97/f1819710-ed5f-b9c4-c40a-8ac55ec736fe/9781917260114.jpg/300x300bb.jpg",
+  "the witch|marie ndiaye":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/fe/15/97/fe159727-b0c1-7e92-cc1b-bde7f9720da5/9798217006816.d.jpg/300x300bb.jpg",
+  "angel down|daniel kraus":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/de/01/e7/de01e732-b607-ead1-8c68-3224b29353b7/1052091038.jpg/300x300bb.jpg",
+  "audition|katie kitamura":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/28/bb/65/28bb65ee-1959-2257-b827-6b002ab21cb5/9780593852330.d.jpg/300x300bb.jpg",
+  "stag dance|torrey peters":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/f9/87/78/f9877882-c102-fd25-c854-1ce38c4c638b/9780593446362.d.jpg/300x300bb.jpg",
+  "the disappearers|marlon james":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/09/0f/11/090f1153-c5f1-a238-569f-450ae5d1c9b0/9780593717226.d.jpg/300x300bb.jpg",
+  "john of john|douglas stuart":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/5c/9f/d8/5c9fd84a-4b28-879a-1581-03d336a23757/9781035086986.jpg/300x300bb.jpg",
+  "the things we never say|elizabeth strout":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/a8/22/06/a82206b2-5bfe-bc3c-f179-7826cb32bf11/9798217154760.d.jpg/300x300bb.jpg",
+  "black bag|luke kennard":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/6d/56/16/6d561659-4005-2292-9413-2b8f4811bd95/9781638933397.d.jpg/300x300bb.jpg",
+  "may we feed the king|rebecca perry":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/61/c1/54/61c154c3-f8c0-4b53-6370-96f3421a8745/9798893380637.jpg/300x300bb.jpg",
+  "exit party|emily st. john mandel":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/22/4a/27/224a2741-7c05-53f2-3b13-aecf4d23eea1/9780593321478.d.jpg/300x300bb.jpg",
+  "under story|chloe benjamin":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/c7/2d/c3/c72dc39c-2481-07a7-1d8b-7bbfa06d0ec7/9781035437412.jpg/300x300bb.jpg",
+  "taipei story|r. f. kuang":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/ae/9c/fa/ae9cfaf1-23f4-8331-30d7-f3ed01249316/dj.rcqrspjs.jpg/300x300bb.jpg",
+  "hollywood, ending|john green":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/21/7c/5c/217c5c02-04dd-ecd8-bbdd-3d8bf3931670/9781101592434.d.jpg/300x300bb.jpg",
+  "hollow bones|jodi picoult":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/00/58/18/00581833-06cf-e33d-98ed-4ed338184bbb/9780593726266.d.jpg/300x300bb.jpg",
+  "contrapposto|dave eggers":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/ca/fe/a5/cafea5cb-3e6b-195b-8be4-6361160a2008/9780593803516.d.jpg/300x300bb.jpg",
+  "the pirate queen|ariel lawhon":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/21/89/79/21897962-7a92-c27e-9003-1abc83ec6a60/9780385550352.d.jpg/300x300bb.jpg",
+  "scion|james islington":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/a3/29/72/a32972d7-25eb-6f41-1941-caedf42e9065/9781668239261.jpg/300x300bb.jpg",
+  "the knave and the moon|rachel gillig":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/65/f4/14/65f414f9-3306-4b7d-b148-838181bd76bf/9780316573818.jpg/300x300bb.jpg",
+  "dead beat|leigh bardugo":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/42/fe/a7/42fea7a3-d082-b1ee-7456-e17423ff7777/9781250884329.jpg/300x300bb.jpg",
+  "the wretched divine|adalyn grace":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/6b/19/e6/6b19e6e1-562d-d3fa-d9ca-43a0cca0e693/9781250397775.jpg/300x300bb.jpg",
+  "threshing day|rebecca yarros":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/bd/20/19/bd201947-420f-0ee9-7c1b-935b26eb266d/9781682818527.jpg/300x300bb.jpg",
+  "murder at the grand alpine hotel|lucy foley":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/6a/8e/28/6a8e28b0-a59c-2ed6-b707-76b0692e68f3/9780063376717.jpg/300x300bb.jpg",
+  "target down|ryan steck":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/fa/5a/69/fa5a69a7-a5e1-4fe6-c76d-867861829276/1064705591.jpg/300x300bb.jpg",
+  "heart of thieves|jessica s. olson":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/8d/b3/d3/8db3d3ea-09b6-a3e5-b32b-9425284197e9/9781250329769.jpg/300x300bb.jpg",
+  "life out of order|audrey niffenegger":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/e5/3a/ad/e53aad5a-0b38-8a8a-e9de-2d29eef11666/9780369785596.jpg/300x300bb.jpg",
+  "every story is a love story|imbolo mbue":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/87/2c/40/872c40b4-a04e-7df7-f17f-3691ccd89fa5/9798217154791.d.jpg/300x300bb.jpg",
+  "friends and family|natalie baszile":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/a4/d7/36/a4d736fb-3c18-afbf-7a2d-ac230b9187bc/9780593492178.d.jpg/300x300bb.jpg",
+  "partita|barbara kingsolver":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/45/c9/6e/45c96e42-4e2f-ee67-b760-aac067e65524/9780063577558.jpg/300x300bb.jpg",
+  "the names of the new world|kawai strong washburn":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/ef/2d/5c/ef2d5c05-29b9-9513-caf9-3c04547e3de2/9780374619718.jpg/300x300bb.jpg",
+  "carrying|samantha josephs":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/f9/a7/da/f9a7da14-290c-6004-35df-a84e68aa994d/9798217180684.d.jpg/300x300bb.jpg",
+  "victorious|v. e. schwab":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/12/26/94/12269413-8772-f6cc-27ed-7e6375b5be9d/9781250192240.jpg/300x300bb.jpg",
+  "the scarlet ball|nghi vo":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/bd/92/b6/bd92b6ed-6ccf-c254-972a-374b628d0823/9781250904973.jpg/300x300bb.jpg",
+  "the sixth faction|veronica roth":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/80/a2/99/80a2990d-9085-0958-0af6-4484ee484288/9780063462564.jpg/300x300bb.jpg",
+  "bad words|rioghnach robinson":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/bb/fc/03/bbfc036c-af92-ad3c-655e-26d2e25fd98f/9781250431318.jpg/300x300bb.jpg",
+  "vengefully matched|audrey goldberg ruoff":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/07/7e/81/077e817f-6a74-710d-560a-5c506d6271eb/9781668226759.jpg/300x300bb.jpg",
+  "a pinch of magic|emily heil":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/ce/93/82/ce9382b9-aa6e-7f98-fd70-0a88fe985abc/9781538779927.jpg/300x300bb.jpg",
+  "blockers: rebels in the deep state|michael lewis":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/03/23/6e/03236e9f-21cb-4b3e-694c-e75521230546/9781324131663.jpg/300x300bb.jpg",
+  "rottenheart|kat dunn":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/24/0e/16/240e164c-efb7-c984-665e-818c3896a0bd/9781638934660.d.jpg/300x300bb.jpg",
+  "the end of everything|m. john harrison":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/45/db/62/45db62fd-001d-1e25-3e5a-b3ccb12a54d2/9798217438679.d.jpg/300x300bb.jpg",
+  "royal witch|philippa gregory":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/34/b7/ce/34b7cef0-b1e0-0cee-1358-e5ab963de248/9780063439771.jpg/300x300bb.jpg",
+  "crash course|piper lawson":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/8f/4f/c9/8f4fc980-eee8-6055-48f1-042f196bb946/9798217238590.d.jpg/300x300bb.jpg",
+  "the tarot trials|katee robert":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/33/0d/6c/330d6c25-6e9f-5e1e-0f05-b6f6aa1b6031/9781250412331.jpg/300x300bb.jpg",
+  "a court of splintered harmony|sarah j. maas":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/c2/34/ff/c234ff20-332f-ecae-a6a8-13e78bc020d7/1064696121.jpg/300x300bb.jpg",
+  "public access afterworld|jane schoenbrun":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/5d/4e/93/5d4e93ab-3e82-1996-8769-537c841cf118/9780593978405.d.jpg/300x300bb.jpg",
+  "whale harbor|mary beth keane":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/eb/7f/77/eb7f77c7-9928-bcac-2a21-dc82e2cd57c9/9781668224656.jpg/300x300bb.jpg",
+  "the last king of faerie|cassandra clare":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/54/eb/e6/54ebe6d9-15f7-eadd-4098-73c5a4532d48/9780593903490.d.jpg/300x300bb.jpg",
+  "a grim reaper's guide to living twice|maxie dara":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/2a/1f/66/2a1f669d-b9d2-4cbb-bf67-41aa5522ccf9/9798217187461.d.jpg/300x300bb.jpg",
+  "peregrine hill|nina de gramont":"https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/d1/19/5d/d1195d87-fa39-942c-18bf-53dec77bc647/9781668214756.jpg/300x300bb.jpg",
+  "prudence marsh is not a nobody anymore|emily krempholtz":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/ac/cf/4c/accf4c02-b282-2286-1168-b85770a3bec3/9780593954331.d.jpg/300x300bb.jpg",
+  "birth of the witch|nora roberts":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/2e/5b/e3/2e5be399-31bb-01b3-5855-9d274479a8eb/9781250431370.jpg/300x300bb.jpg",
+  "beneath a midnight moon|catherine cowles":"https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/01/74/c2/0174c211-7f9c-deab-d082-46488c048f97/9781911747314.jpg/300x300bb.jpg"
 };
 
 // [title, author, genre, date (YYYY-MM-DD or YYYY-MM or null), tags, award, note, original language]
@@ -279,7 +340,7 @@ let B = [
 ["Birth of the Witch","Nora Roberts","Fantasy","2026-11",[],"","Reincarnation, witches and long-buried secrets.",""],
 ["The Heist Before Christmas","Lucy Score","Romance","2026-11",["easy"],"","A Riley Thorn story: mystery, romance and chaos with a Christmas setting.",""],
 ["Beneath a Midnight Moon","Catherine Cowles","Romance","2026-11",["easy"],"","An emotional small-town romance.",""]
-].map(([t,a,g,d,tags,aw,n,lang])=>({t,a,g,d,tags,aw,n,lang}));
+].map(([t,a,g,d,tags,aw,n,lang])=>({t,a,g,d,tags,aw,n,lang,cover:COVERS[(t+"|"+a).toLowerCase()]||""}));
 
 const GENRES = {
   "Literary fiction":"--g-lit","Fantasy":"--g-fan","Romance":"--g-rom","Thriller & mystery":"--g-thr",
